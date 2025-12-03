@@ -1,0 +1,28 @@
+services:
+  # Backend FastAPI
+  - type: web
+    name: taskflow-backend
+    runtime: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install uv && uv sync
+    startCommand: uv run uvicorn src.app:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    envVars:
+      - key: DATABASE_URL
+        sync: false  # Configuré manuellement
+      - key: CORS_ORIGINS
+        sync: false
+    healthCheckPath: /health
+  # Frontend React
+  - type: web
+    name: taskflow-frontend
+    runtime: static
+    region: frankfurt
+    plan: free
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    rootDir: frontend
+    envVars:
+    - key: VITE_API_URL
+      sync: false
